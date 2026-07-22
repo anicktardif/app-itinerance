@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a3a52">
+  <meta name="description" content="Spots pour dormir — communauté Québec. Toléré, surveillé ou à éviter.">
+  <title>App Itinérance — Spots pour dormir</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenu-principal">Aller au contenu</a>
+
+  <header class="app-header" role="banner">
+    <div class="app-header__brand">
+      <img src="icons/icon.svg" alt="" width="40" height="40" aria-hidden="true" class="app-header__logo">
+      <div>
+        <p class="app-header__eyebrow">App Itinérance</p>
+        <h1 class="app-header__title">Spots pour dormir</h1>
+      </div>
+    </div>
+    <p class="app-header__region">
+      <span class="region-dot" aria-hidden="true"></span>
+      Agglomération de Québec
+    </p>
+  </header>
+
+  <section class="legend" aria-label="Signification des couleurs">
+    <div class="legend__item legend__item--green">
+      <span class="legend__swatch" aria-hidden="true"></span>
+      <span class="legend__icon" aria-hidden="true">✓</span>
+      <span>Toléré</span>
+    </div>
+    <div class="legend__item legend__item--yellow">
+      <span class="legend__swatch" aria-hidden="true"></span>
+      <span class="legend__icon" aria-hidden="true">!</span>
+      <span>Surveillé</span>
+    </div>
+    <div class="legend__item legend__item--red">
+      <span class="legend__swatch" aria-hidden="true"></span>
+      <span class="legend__icon" aria-hidden="true">✕</span>
+      <span>À éviter</span>
+    </div>
+  </section>
+
+  <nav class="view-toggle" aria-label="Choisir la vue">
+    <button type="button" class="view-toggle__btn view-toggle__btn--active" data-view="map" aria-pressed="true">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+      <span>Carte</span>
+    </button>
+    <button type="button" class="view-toggle__btn" data-view="list" aria-pressed="false">
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M3 5h18v3H3V5zm0 7h18v3H3v-3zm0 7h18v3H3v-3z"/></svg>
+      <span>Liste</span>
+    </button>
+  </nav>
+
+  <main id="contenu-principal" class="main">
+    <div id="map-view" class="view view--active" role="region" aria-label="Carte des spots">
+      <div id="map" class="map"></div>
+      <p class="map-hint">Touchez un marqueur ou un spot dans la liste</p>
+    </div>
+
+    <div id="list-view" class="view" role="region" aria-label="Liste des spots" hidden>
+      <ul id="spot-list" class="spot-list"></ul>
+    </div>
+  </main>
+
+  <dialog id="spot-sheet" class="spot-sheet" aria-labelledby="spot-sheet-title">
+    <div class="spot-sheet__header">
+      <div class="spot-sheet__status" id="spot-sheet-status" aria-live="polite"></div>
+      <button type="button" class="spot-sheet__close" id="spot-sheet-close" aria-label="Fermer">
+        <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+    </div>
+
+    <div class="spot-sheet__body">
+      <h2 id="spot-sheet-title" class="spot-sheet__title"></h2>
+      <p id="spot-sheet-area" class="spot-sheet__area"></p>
+      <p id="spot-sheet-summary" class="spot-sheet__summary"></p>
+
+      <section class="quick-actions" aria-label="Actions rapides">
+        <h3 class="section-label">Dire rapidement</h3>
+        <div class="quick-actions__grid">
+          <button type="button" class="quick-btn quick-btn--going" data-action="going">
+            <span class="quick-btn__icon" aria-hidden="true">→</span>
+            <span class="quick-btn__label">J'y vais</span>
+          </button>
+          <button type="button" class="quick-btn quick-btn--watched" data-action="watched">
+            <span class="quick-btn__icon" aria-hidden="true">!</span>
+            <span class="quick-btn__label">Surveillé</span>
+          </button>
+          <button type="button" class="quick-btn quick-btn--tolerated" data-action="tolerated">
+            <span class="quick-btn__icon" aria-hidden="true">✓</span>
+            <span class="quick-btn__label">Toléré</span>
+          </button>
+        </div>
+        <p id="quick-feedback" class="quick-feedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="comments" aria-label="Commentaires récents">
+        <h3 class="section-label">Commentaires</h3>
+        <ul id="comments-list" class="comments__list"></ul>
+      </section>
+
+      <section class="add-comment" aria-label="Ajouter un commentaire">
+        <h3 class="section-label">Votre mot</h3>
+        <p class="add-comment__hint">Pas de compte. Anonyme ou avec un prénom / pseudo.</p>
+        <label class="field">
+          <span class="field__label">Prénom ou pseudo <span class="optional">(facultatif)</span></span>
+          <input type="text" id="comment-name" class="field__input" maxlength="24" placeholder="Anonyme" autocomplete="nickname">
+        </label>
+        <label class="field">
+          <span class="field__label">Commentaire</span>
+          <textarea id="comment-text" class="field__input field__textarea" rows="3" maxlength="280" placeholder="Ex. : calme ce soir, patrouille vers 23 h…"></textarea>
+        </label>
+        <button type="button" id="comment-submit" class="btn-primary">
+          <span aria-hidden="true">+</span>
+          Envoyer
+        </button>
+      </section>
+    </div>
+  </dialog>
+
+  <footer class="app-footer" role="contentinfo">
+    <p>Info communautaire · Peut changer vite · Urgence : <strong>911</strong></p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

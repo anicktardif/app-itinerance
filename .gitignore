@@ -1,0 +1,24 @@
+# =============================================================================
+# Assistants IA — Cursor, Claude, etc.
+# Configuration locale et outillage agents, à ne pas versionner.
+# =============================================================================
+
+# Cursor
+.cursor/
+.cursorrules
+.cursorignore
+AGENTS.md
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Skills (Cursor, Claude, ou dossiers locaux)
+**/SKILL.md
+skills/
+.skills/
+
+# Autres assistants / IDE IA (au besoin)
+.aider*
+.continue/
+.windsurf/

@@ -1,0 +1,19 @@
+{
+  "name": "App Itinérance — Spots pour dormir",
+  "short_name": "Spots dormir",
+  "description": "Spots pour dormir dans l'agglomération de Québec. Info communautaire, anonyme.",
+  "lang": "fr-CA",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f1ec",
+  "theme_color": "#1a3a52",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
